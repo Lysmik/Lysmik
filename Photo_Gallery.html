@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo — Gallery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Acme&family=Alumni+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(180deg, #171a1d 0%, #242424 100%);
+            font-family: Arial, sans-serif;
+            box-sizing: border-box;
+            animation: page-reveal 1.5s ease-in-out both;
+        }
+
+        @keyframes page-reveal {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .gallery-section {
+            min-height: 100vh;
+            padding: 12px 20px 60px;
+            box-sizing: border-box;
+        }
+
+        .site-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            align-items: center;
+            min-height: 68px;
+            margin-bottom: 8px;
+        }
+
+        .site-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-self: start;
+        }
+
+        .site-logo {
+            color: #e8e8e8;
+            font-family: "Acme", sans-serif;
+            font-size: clamp(30px, 4vw, 46px);
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-decoration: none;
+        }
+
+        .back-link {
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            flex: 0 0 auto;
+            transition: transform 0.25s ease, filter 0.25s ease;
+        }
+
+        .back-link:hover {
+            transform: translateX(-4px);
+            filter: brightness(1.25);
+        }
+
+        .back-link img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .gallery-link {
+            justify-self: center;
+            color: #777;
+            font-size: clamp(20px, 2.4vw, 28px);
+            font-weight: 700;
+        }
+
+        .teardown-social-links {
+            justify-self: end;
+            display: flex;
+            align-items: center;
+            gap: clamp(6px, 1vw, 12px);
+        }
+
+        .boosty-link {
+            position: relative;
+            top: -3px;
+            display: none;
+            width: clamp(70px, 7.5vw, 110px);
+            height: 34px;
+            transition: transform 0.25s ease, filter 0.25s ease;
+        }
+
+        .gallery-section.teardown-album .boosty-link {
+            display: block;
+        }
+
+        .boosty-link:hover {
+            transform: scale(1.06);
+            filter: brightness(1.12);
+        }
+
+        .boosty-link img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .telegram-link {
+            justify-self: end;
+            display: grid;
+            place-items: center;
+            width: 48px;
+            height: 48px;
+            border: 2px solid #e8e8e8;
+            border-radius: 50%;
+            color: #e8e8e8;
+            transition: color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+        }
+
+        .telegram-link:hover {
+            color: #078cff;
+            border-color: #078cff;
+            transform: scale(1.06);
+        }
+
+        .telegram-link svg {
+            width: 27px;
+            height: 27px;
+            fill: currentColor;
+        }
+
+        .slider-container {
+            min-height: calc(100vh - 88px);
+            border: 4px solid #078cff;
+            box-shadow: 0 0 8px #078cff, 0 0 20px rgba(0, 140, 255, 0.75);
+            background: #1b355e;
+            padding: 27px;
+            box-sizing: border-box;
+        }
+
+        .slider-container.album-view {
+            background: #101820;
+        }
+
+        .gallery-section.album-page .site-logo {
+            font-size: clamp(22px, 3vw, 36px);
+        }
+
+        .gallery-section.teardown-album .site-title {
+            min-width: 0;
+        }
+
+        .gallery-section.teardown-album .site-logo {
+            min-width: 0;
+            font-size: clamp(16px, 2.5vw, 32px);
+            line-height: 1.05;
+            overflow-wrap: anywhere;
+        }
+
+        .album-heading {
+            margin: 0 0 22px;
+            color: #8d8d8d;
+            font-family: "Alumni Sans", sans-serif;
+            font-size: clamp(24px, 3vw, 34px);
+            font-weight: 500;
+        }
+
+        .slider-track {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 28px 34px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .album-card {
+            display: block;
+            min-width: 0;
+            color: #8d8d8d;
+            font-family: "Alumni Sans", sans-serif;
+            font-size: clamp(18px, 1.7vw, 24px);
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .album-card img,
+        .photo-card img {
+            display: block;
+            width: 100%;
+            aspect-ratio: 3 / 2;
+            object-fit: cover;
+            background: #000;
+            transition: transform 0.35s ease, filter 0.35s ease;
+        }
+
+        .album-card img {
+            border: 2px solid rgba(7, 140, 255, 0.35);
+            box-sizing: border-box;
+        }
+
+        .album-card:hover {
+            color: #b6d8ff;
+        }
+
+        .album-card:hover img,
+        .photo-card:hover img {
+            transform: scale(1.025);
+            filter: brightness(1.08);
+        }
+
+        .album-card-title {
+            display: block;
+            margin-top: 8px;
+        }
+
+        .photo-card {
+            position: relative;
+            min-width: 0;
+            aspect-ratio: 3 / 2;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .photo-card:hover {
+            z-index: 10;
+        }
+
+        .photo-card img {
+            height: 100%;
+            cursor: pointer;
+            transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+                        filter 0.45s ease;
+        }
+
+        .photo-card:hover img {
+            transform: scale(1.055);
+            filter: brightness(1.08);
+        }
+
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.92);
+            padding: 30px;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.35s ease, visibility 0.35s ease;
+        }
+
+        .lightbox.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .lightbox img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transform: scale(0.92);
+            transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .lightbox.open img {
+            transform: scale(1);
+        }
+
+        .gallery-error {
+            color: #e8e8e8;
+            font-size: 18px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            body {
+                animation: none;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .slider-track {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 560px) {
+            .gallery-section {
+                padding: 12px 12px 40px;
+            }
+
+            .gallery-section.teardown-album .site-logo {
+                font-size: 15px;
+                letter-spacing: 0;
+            }
+
+            .site-header {
+                min-height: 56px;
+                margin-bottom: 8px;
+            }
+
+            .telegram-link {
+                width: 40px;
+                height: 40px;
+            }
+
+            .gallery-section.teardown-album .boosty-link {
+                top: -2px;
+                width: 56px;
+                height: 26px;
+            }
+
+            .slider-container {
+                min-height: calc(100vh - 76px);
+                padding: 10px;
+                border-width: 3px;
+            }
+
+            .slider-track {
+                gap: 16px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<main class="gallery-section">
+    <header class="site-header">
+        <div class="site-title">
+            <a class="back-link" id="back-link" href="LP.html" aria-label="Вернуться на главную страницу">
+                <img src="Photo/Arrow.png" alt="">
+            </a>
+            <span class="site-logo" id="site-logo">Photo</span>
+        </div>
+        <span class="gallery-link">Gallery</span>
+        <div class="teardown-social-links">
+            <a class="boosty-link" href="https://boosty.to/fly.lind" target="_blank" rel="noopener noreferrer" aria-label="Поддержать на Boosty">
+                <img src="Photo/Boosty.png" alt="">
+            </a>
+            <a class="telegram-link" href="https://t.me/Lysmik_Photo" target="_blank" rel="noopener noreferrer" aria-label="Открыть Telegram">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M21.8 4.2 18.6 19c-.24 1.05-.86 1.3-1.74.81l-4.8-3.54-2.32 2.23c-.26.26-.48.48-.98.48l.35-4.9 8.92-8.06c.39-.35-.09-.55-.61-.2L6.39 12.93 1.65 11.45c-1.03-.32-1.05-1.03.22-1.53L20.4 2.77c.85-.31 1.59.21 1.4 1.43Z"/>
+                </svg>
+            </a>
+        </div>
+    </header>
+
+    <div class="slider-container" id="slider-container">
+        <div class="slider-track" id="slider-track"></div>
+    </div>
+
+    <div class="lightbox" id="lightbox" aria-hidden="true">
+        <img src="" alt="Просмотр фотографии">
+    </div>
+</main>
+
+<script>
+    const albums = {
+        '74-ru': {
+            title: '74.RU',
+            folder: '74.RU',
+            cover: 'Group 114.png',
+            photos: [
+                'Group 114.png', 'Group 105.png', 'Group 106.png', 'Group 107.png',
+                'Group 108.png', 'Group 109.png', 'Group 110.png', 'Group 111.png',
+                'Group 112.png', 'Group 113.png'
+            ]
+        },
+        'snow-in-november': {
+            title: 'Snow in November',
+            folder: 'Snow in November',
+            cover: '_DSC0609M.jpg',
+            photos: [
+                '_DSC0609M.jpg', '_DSC0615M.jpg', '_DSC0622M.jpg', '_DSC0631M.jpg',
+                '_DSC0635M.jpg', '_DSC0638M.jpg', '_DSC1259M.jpg', '_DSC1277M.jpg',
+                '_DSC1280M.jpg', '_DSC1290M.jpg', '_DSC1299-2M.jpg', '_DSC1311M.jpg',
+                '_DSC7208M.jpg', '_DSC7226M.jpg', '_DSC7228M.jpg', '_DSC7231M.jpg'
+            ]
+        },
+        cars: {
+            title: 'Cars',
+            folder: 'Cars',
+            cover: '_DSC0061.2M.jpg',
+            photos: [
+                '_DSC0061.2M.jpg', '_DSC0131M.jpg', '_DSC0135M.jpg', '_DSC0156M.jpg',
+                '_DSC0300M.jpg', '_DSC1024M.jpg', '_DSC1065-2M.jpg',
+                '_DSC1113M.jpg', '_DSC1124M.jpg', '_DSC1139M.jpg', '_DSC1357M.jpg',
+                '_DSC1361M.jpg', '_DSC1363M.jpg', '_DSC1381M.jpg'
+            ]
+        },
+        'first-snow-in-october': {
+            title: 'First snow in October',
+            folder: 'First snow in October',
+            cover: '_DSC4596M.jpg',
+            photos: [
+                '_DSC4596M.jpg', '_DSC0350M.jpg', '_DSC4507M.jpg', '_DSC4553M.jpg',
+                '_DSC4562M.jpg', '_DSC4601M.jpg', '_DSC4662M.jpg',
+                '_DSC4668M.jpg'
+            ]
+        },
+        teardown: {
+            title: 'My modifications for Teardown',
+            root: 'Photo_Teardown',
+            folder: '',
+            cover: '2026-08-29-22-35-46.jpg',
+            photos: [
+                '2026-08-29-22-35-46.jpg', '2026-08-29-22-36-22.jpg',
+                '2026-08-29-22-36-39.jpg', '2026-08-29-22-37-27.jpg',
+                '2026-08-29-22-38-23.jpg', '2026-08-29-22-39-25.jpg',
+                '2026-08-29-22-39-46.jpg', '2026-08-29-22-40-26.jpg',
+                '2026-08-29-22-40-35.jpg', '2026-08-29-22-41-02.jpg',
+                '2026-08-29-22-41-47.jpg', '2026-08-29-22-44-06.jpg',
+                '2026-08-29-22-44-21.jpg', '2026-08-29-22-45-37.jpg',
+                '2026-08-29-22-46-03.jpg', '2026-08-29-22-46-38.jpg',
+                '2026-08-29-22-49-11.jpg', '2026-08-29-22-49-48.jpg',
+                '2026-08-29-22-57-04.jpg', '2026-08-29-23-08-16.jpg',
+                '2026-10-04-00-36-34.jpg', '2026-10-04-00-36-42.jpg',
+                '2026-10-04-00-42-32-3.jpg', '2026-10-04-00-42-58-3.jpg',
+                '2026-10-08-23-48-35.jpg', '2026-10-08-23-50-22.jpg',
+                '2026-10-08-23-50-32.jpg', '2026-10-08-23-51-00.jpg',
+                '2026-10-08-23-58-14.jpg', '2026-10-09-00-00-44.jpg',
+                '2026-10-09-00-04-59.jpg'
+            ]
+        }
+    };
+
+    const track = document.getElementById('slider-track');
+    const sliderContainer = document.getElementById('slider-container');
+    const gallerySection = document.querySelector('.gallery-section');
+    const siteLogo = document.getElementById('site-logo');
+    const backLink = document.getElementById('back-link');
+    const telegramLink = document.querySelector('.telegram-link');
+    const selectedAlbum = new URLSearchParams(window.location.search).get('album');
+
+    function photoUrl(folder, filename, root = 'Photo_Gallery') {
+        return [root, folder, filename]
+            .filter(Boolean)
+            .map((part) => encodeURIComponent(part))
+            .join('/');
+    }
+
+    function renderAlbumList() {
+        Object.entries(albums).forEach(([id, album]) => {
+            const link = document.createElement('a');
+            link.className = 'album-card';
+            link.href = album.href || `Photo_Gallery.html?album=${encodeURIComponent(id)}`;
+
+            const image = document.createElement('img');
+            image.src = photoUrl(album.folder, album.cover, album.root);
+            image.alt = album.title;
+            image.loading = 'lazy';
+
+            const title = document.createElement('span');
+            title.className = 'album-card-title';
+            title.textContent = album.title;
+
+            link.append(image, title);
+            track.append(link);
+        });
+    }
+
+    function renderAlbum(album) {
+        document.title = `${album.title} — Gallery`;
+        siteLogo.textContent = album.title;
+        sliderContainer.classList.add('album-view');
+        gallerySection.classList.add('album-page');
+        gallerySection.classList.toggle('teardown-album', album.root === 'Photo_Teardown');
+        const isTeardownAlbum = album.root === 'Photo_Teardown';
+        backLink.href = isTeardownAlbum ? 'LP.html#menu' : 'Photo_Gallery.html';
+        backLink.setAttribute(
+            'aria-label',
+            isTeardownAlbum ? 'Вернуться в главное меню' : 'Вернуться к альбомам'
+        );
+        if (isTeardownAlbum) {
+            telegramLink.href = 'https://t.me/aB88777';
+        }
+
+        album.photos.forEach((filename, index) => {
+            const figure = document.createElement('div');
+            figure.className = 'photo-card';
+
+            const image = document.createElement('img');
+            image.src = photoUrl(album.folder, filename, album.root);
+            image.alt = `${album.title}, фотография ${index + 1}`;
+            image.loading = 'lazy';
+            image.addEventListener('click', () => openLightbox(image));
+
+            figure.append(image);
+            track.append(figure);
+        });
+    }
+
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImage = lightbox.querySelector('img');
+
+    function openLightbox(image) {
+        lightboxImage.src = image.src;
+        lightboxImage.alt = image.alt;
+        lightbox.classList.add('open');
+        lightbox.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeLightbox() {
+        lightbox.classList.remove('open');
+        lightbox.setAttribute('aria-hidden', 'true');
+    }
+
+    if (selectedAlbum === null) {
+        renderAlbumList();
+    } else if (Object.prototype.hasOwnProperty.call(albums, selectedAlbum)) {
+        renderAlbum(albums[selectedAlbum]);
+    } else {
+        const error = document.createElement('p');
+        error.className = 'gallery-error';
+        error.textContent = 'Альбом не найден. Вернитесь к списку альбомов.';
+        track.append(error);
+    }
+
+    lightbox.addEventListener('click', closeLightbox);
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeLightbox();
+        }
+    });
+</script>
+</body>
+</html>
